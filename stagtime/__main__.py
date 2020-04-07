@@ -1,3 +1,19 @@
+"""Print a line at the moment of each standard TagTime ping.
+
+Simple standalone usage:
+
+    python stagtime/
+
+You probably want to pipe this into something that catches your attention:
+
+    python stagtime/ | while read; do afplay /System/Library/Sounds/Purr.aiff; done
+
+I personally have the following command run on startup:
+
+    tmux new -d -s tagtimed -- 'cd ~/stagtime/; python stagtime/ | while read line; do echo "$line"; for _ in {1..3}; do afplay /System/Library/Sounds/Purr.aiff; done; done; bash'
+
+"""
+
 import argparse
 import datetime
 import enum
@@ -32,7 +48,7 @@ def main(
     timekeeper: Timekeeper = None,
     get_time: t.Callable[[], datetime.datetime] = lambda: datetime.datetime.now(UTC),
     sleep: t.Callable[[datetime.timedelta], None] = lambda dt: time.sleep(dt.total_seconds()),
-    print: t.Callable[[str], None] = print,
+    print: t.Callable[[str], None] = lambda s: (print(s), sys.stdout.flush()),
     start_ago: datetime.timedelta = datetime.timedelta(seconds=0),
 ):
     if timekeeper is None:
